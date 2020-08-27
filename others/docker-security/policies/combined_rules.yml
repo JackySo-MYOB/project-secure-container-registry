@@ -1,0 +1,7 @@
+---
+profile:
+  name: "Combined Rule Set"
+  description: "Combined rule set for Hugo Builder application."
+  includes:
+    - security_rules.yml
+    - additional_rules.yml

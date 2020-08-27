@@ -1,0 +1,67 @@
+---
+profile:
+  name: "Additional application rules"
+  description: "Additional security rules for Hugo Builder"
+
+line_rules:
+  LABEL:
+    paramSyntaxRegex: /.+/
+    defined_namevals:
+      Maintainer:
+        valueRegex: /.+\@.+\..+/
+        message: "Label 'Maintainer' is missing or invalid."
+        level: "error"
+        required: true
+
+  FROM:
+    paramSyntaxRegex: /.+/
+    rules:
+      -
+        label: "is_latest_tag"
+        regex: /latest/
+        level: "error"
+        message: "base image uses 'latest' tag"
+        description: "Using the 'latest' tag may cause unpredictable builds. It is recommended that a specific tag is used in the FROM line or *-released which is the latest supported release."
+        reference_url:
+          - "https://docs.docker.com/engine/reference/builder/"
+          - "#from"
+      -
+        label: "no_tag"
+        regex: /[:]/
+        level: "error"
+        inverse_rule: true
+        message: "No tag is used"
+        description: "It is recommended that a specific tag is used in the FROM line or *-released which is the latest supported release."
+        reference_url:
+          - "https://docs.docker.com/engine/reference/builder/"
+          - "#from"
+
+  HEALTHCHECK:
+    paramSyntaxRegex: /.+/
+    rules:
+      -
+        label: "no_curl_healthchecks"
+        regex: /curl/
+        level: "error"
+        message: "Don't use cURL for healthchecks"
+        reference_url:
+          - "https://blog.sixeyed.com/docker-healthchecks-why-not-to-use-curl-or-iwr/"
+
+required_instructions:
+  -
+    instruction: "LABEL"
+    count: 1
+    level: "error"
+    message: "No 'LABEL' instruction in the file"
+    description: "The Dockerfile should contain a 'LABEL' instruction with at least the maintainer tag"
+    reference_url:
+      - "https://docs.docker.com/engine/reference/builder/"
+      - "#label"
+  -
+    instruction: "HEALTHCHECK"
+    count: 1
+    level: "error"
+    message: "Use a 'HEALTHCHECK' instruction to monitor the container's health"
+    reference_url:
+      - "https://docs.docker.com/engine/reference/builder/"
+      - "#healthcheck"
